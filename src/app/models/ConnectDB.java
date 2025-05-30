@@ -24,23 +24,18 @@ public class ConnectDB {
 
     public static boolean ExistAccount(String username,String password)//判断数据库中是否存在提供的用户
     {
+        String sql=String.format("select * from user where username='%s' and password='%s'",username,password);
         try {
-            re = st.executeQuery("select * from user");
-            while(re.next())
-            {
-                if(username.equals(re.getString("username"))&&password.equals(re.getString("password")))
-                {
-                    return true;
-                }
-            }
+            re = st.executeQuery(sql);
+            return re.next();//如果有下一个值就是不空
         } catch (SQLException e) {
             System.out.println("find_user_sql_error");
         }
-            return false;
+        return false;
     }
 
     //插入数据
-    public static SQLException AddData(String sql){//提供sql语句，如果发生了异常返回0，否则返回1
+    public static SQLException AddData(String sql){//提供sql语句，如果有异常返回异常，否则返回null
         try {
             st.executeUpdate(sql);
         } catch (SQLException e) {

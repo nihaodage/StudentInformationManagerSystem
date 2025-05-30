@@ -150,6 +150,7 @@ public class MainMenu {
         user_maintain.addActionListener(new ActionListener() {//点击用户维护
             @Override
             public void actionPerformed(ActionEvent e) {
+                UserMaintain.show(menu);
                 System.out.println("点击用户维护");
             }
         });

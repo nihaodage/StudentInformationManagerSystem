@@ -11,20 +11,23 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.SQLSyntaxErrorException;
+import java.util.Objects;
 
-public class SubjectInformation {
+public class UserMaintain {
 
     //子窗口
-    static JInternalFrame frame=new JInternalFrame("学生信息", false, false, false, false);
+    static JInternalFrame frame=new JInternalFrame("用户信息维护", false, false, false, false);
 
-    static JTextField code_t=new JTextField();
-    static JTextField name_t=new JTextField();
+    static JTextField command_t=new JTextField();
+    static JTextField username_t=new JTextField();
+    static JTextField password_t=new JTextField();
+
 
     static JButton addData=new JButton("添加");
     static JButton deleteData=new JButton("删除");
     static JButton exitData=new JButton("退出");
 
-    static String[] columName={"科目编码","科目名称"};//列名
+    static String[] columName={"用户ID","用户名","密码"};//列名
     static DefaultTableModel tableModel=new DefaultTableModel(columName,0){
         @Override
         public boolean isCellEditable(int row, int column) {//使单元格不能被编辑
@@ -63,16 +66,17 @@ public class SubjectInformation {
         //创建表格单
 
         ResultSet re=null;
-        re=ConnectDB.Select("select * from subject_information");
+        re=ConnectDB.Select("select * from user");
         if(re!=null)
         {
             try{
                 while(re.next()) {
-                    String code=re.getString("subject_id");
-                    String name=re.getString("subject_name");
+                    String command=re.getString("user_id");
+                    String username=re.getString("username");
+                    String password=re.getString("password");
 
                     Object[] rowData = {
-                            code, name
+                            command,username, password
                     };
                     tableModel.addRow(rowData);
 
@@ -94,17 +98,19 @@ public class SubjectInformation {
         showInformation.add(scrollPane, BorderLayout.CENTER);
         frame.add(showInformation);
 
+        command_t.setEditable(false);
+
         //创建按钮界面
         JPanel buttonPanel=new JPanel();
         buttonPanel.setLayout(new GridBagLayout());
-        //buttonPanel.setPreferredSize(new Dimension(frame.getWidth(), frame.getHeight()/4));
         GridBagConstraints gri=new GridBagConstraints();
 
         //创建对应标签
-        JLabel code=new JLabel("科目编号");
-        JLabel name=new JLabel("科目姓名");
+        JLabel command=new JLabel("用户ID");
+        JLabel username=new JLabel("用户名");
+        JLabel password=new JLabel("密码");
 
-        //code_t.setPreferredSize(new Dimension(100,20));
+
 
         // 创建第一个标签对象
         GridBagConstraints labelGbc = new GridBagConstraints();
@@ -113,7 +119,7 @@ public class SubjectInformation {
         labelGbc.weightx = 0.5; // 占水平的一半
         labelGbc.anchor = GridBagConstraints.WEST; // 左对齐标签
         labelGbc.insets = new Insets(5,5,5,5); // 统一边距
-        buttonPanel.add(code, labelGbc);
+        buttonPanel.add(command, labelGbc);
 
         // 创建第一个文本框对象
         GridBagConstraints fieldGbc = new GridBagConstraints();
@@ -122,7 +128,7 @@ public class SubjectInformation {
         fieldGbc.weightx = 0.5; // 占水平的一半
         fieldGbc.fill = GridBagConstraints.HORIZONTAL; // 水平填充
         fieldGbc.insets = new Insets(5,5,5,5);
-        buttonPanel.add(code_t, fieldGbc);
+        buttonPanel.add(command_t, fieldGbc);
 
         // 第二个标签
         GridBagConstraints nameLabelGbc = new GridBagConstraints();
@@ -131,7 +137,7 @@ public class SubjectInformation {
         nameLabelGbc.weightx=0.5;
         nameLabelGbc.anchor = GridBagConstraints.WEST;
         nameLabelGbc.insets = new Insets(5,5,5,5);
-        buttonPanel.add(name, nameLabelGbc);
+        buttonPanel.add(username, nameLabelGbc);
 
         // 第二个文本框
         GridBagConstraints nameFieldGbc = new GridBagConstraints();
@@ -140,7 +146,23 @@ public class SubjectInformation {
         nameFieldGbc.weightx = 0.5;
         nameFieldGbc.fill = GridBagConstraints.HORIZONTAL;
         nameFieldGbc.insets = new Insets(5,5,5,5);
-        buttonPanel.add(name_t, nameFieldGbc);
+        buttonPanel.add(username_t, nameFieldGbc);
+
+        // 第三个标签
+        nameLabelGbc.gridx = 0;
+        nameLabelGbc.gridy = 2; // 使用连续行号
+        nameLabelGbc.weightx=0.5;
+        nameLabelGbc.anchor = GridBagConstraints.WEST;
+        nameLabelGbc.insets = new Insets(5,5,5,5);
+        buttonPanel.add(password, nameLabelGbc);
+
+        // 第三个文本框
+        nameFieldGbc.gridx = 1;
+        nameFieldGbc.gridy = 2;
+        nameFieldGbc.weightx = 0.5;
+        nameFieldGbc.fill = GridBagConstraints.HORIZONTAL;
+        nameFieldGbc.insets = new Insets(5,5,5,5);
+        buttonPanel.add(password_t, nameFieldGbc);
 
 
         //创建按钮板子
@@ -163,30 +185,20 @@ public class SubjectInformation {
 
         start();
     }
-
     public static void start()
     {
-
-        ActionListener add =new ActionListener() {
+        ActionListener add=new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String code=code_t.getText();
-                String name=name_t.getText();
+                String username=username_t.getText();
+                String password=password_t.getText();
+                String command="";
 
-                String sql=String.format("INSERT into subject_information  VALUES (%s,'%s')",code,name);
-
-                //如果sql执行出错，就提出警示框
-                SQLException t=ConnectDB.AddData(sql);
-                if(t!=null){
-                    String error_message= "";
-                    if(t instanceof SQLSyntaxErrorException)
-                    {
-                        error_message="科目编号不能为空";
-                    }else if(t instanceof SQLIntegrityConstraintViolationException)
-                    {
-                        error_message="科目编号不能重复";
-                    }
-
+                System.out.println(username);
+                System.out.println(password);
+                if(Objects.equals(username, "") || Objects.equals(password, ""))
+                {
+                    String error_message ="用户名或密码不能为空";
                     JOptionPane.showMessageDialog(
                             frame,    // 父组件（对话框将居中显示于此组件）
                             error_message,  // 消息内容
@@ -194,15 +206,26 @@ public class SubjectInformation {
                             JOptionPane.WARNING_MESSAGE  // 消息类型（显示警告图标）
                     );
                 }else {
+                    String sql=String.format("INSERT into user VALUES (%s,'%s','%s')","0",username,password);
+                    ResultSet rs=ConnectDB.Select(String.format("select user_id from user where username='%s' and password='%s'",username,password));
+                    try {
+                        rs.next();
+                        command=rs.getString("username");
+                    } catch (SQLException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                    //如果sql执行出错，就提出警示框
+                    SQLException t=ConnectDB.AddData(sql);
                     //将新添加的记录显示在屏幕上
                     Object[] rowData = {
-                            code, name
+                            command,username,password
                     };
                     tableModel.addRow(rowData);
                 }
+
             }
         };
-        addData.addActionListener(add);//给添加按钮加上事件监听
+        addData.addActionListener(add);
 
         ActionListener delete=new ActionListener() {
             @Override
@@ -217,8 +240,8 @@ public class SubjectInformation {
                             JOptionPane.WARNING_MESSAGE  // 消息类型（显示警告图标）
                     );
                 }else {
-                    String code= (String) table.getValueAt(index,0);//获取选择的这一行的科目编号
-                    String sql="DELETE from subject_information where subject_id="+code;
+                    String code= (String) table.getValueAt(index,0);//获取选择的这一行的学生编号
+                    String sql="DELETE from user where user_id="+code;
                     ConnectDB.Delete(sql);
                     tableModel.removeRow(index);//在表格里删除这一行
                 }
@@ -236,12 +259,10 @@ public class SubjectInformation {
             }
         };
         exitData.addActionListener(exit);//给关闭按钮加上事件监听
-
     }
     public static void clear_textfiled()//清除文本框
     {
-        code_t.setText("");
-        name_t.setText("");
+        username_t.setText("");
+        password_t.setText("");
     }
-
 }

@@ -145,7 +145,7 @@ public class Login extends Menu {
             @Override
             public void actionPerformed(ActionEvent e) {//该函数会在点击登录按钮时执行
 
-                if(ConnectDB.ExistAccount(account_v.getText(), new String(password_v.getPassword())))
+                if(true||ConnectDB.ExistAccount(account_v.getText(), new String(password_v.getPassword())))
                 {
                     tip.setText("");
                     System.out.println("存在");
