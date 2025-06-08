@@ -3,6 +3,8 @@ package app.views;
 import app.models.ConnectDB;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -11,6 +13,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.SQLSyntaxErrorException;
+import java.util.Objects;
 
 public class SubjectInformation {
 
@@ -23,6 +26,7 @@ public class SubjectInformation {
     static JButton addData=new JButton("添加");
     static JButton deleteData=new JButton("删除");
     static JButton exitData=new JButton("退出");
+    static JButton alterData=new JButton("修改");
 
     static String[] columName={"科目编码","科目名称"};//列名
     static DefaultTableModel tableModel=new DefaultTableModel(columName,0){
@@ -147,6 +151,7 @@ public class SubjectInformation {
         JPanel choosePanel=new JPanel();
         choosePanel.add(addData);
         choosePanel.add(deleteData);
+        choosePanel.add(alterData);
         choosePanel.add(exitData);
 
         //将按钮板子加入按钮模版
@@ -199,7 +204,9 @@ public class SubjectInformation {
                             code, name
                     };
                     tableModel.addRow(rowData);
+                    clear_textfiled();
                 }
+
             }
         };
         addData.addActionListener(add);//给添加按钮加上事件监听
@@ -222,26 +229,87 @@ public class SubjectInformation {
                     ConnectDB.Delete(sql);
                     tableModel.removeRow(index);//在表格里删除这一行
                 }
+                clear_textfiled();
             }
         };
         deleteData.addActionListener(delete);
+
+
+        ActionListener alter=new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int index=table.getSelectedRow();
+                if(index==-1) {
+                    JOptionPane.showMessageDialog(
+                            frame,    // 父组件（对话框将居中显示于此组件）
+                            "未选择行",  // 消息内容
+                            "错误",               // 对话框标题
+                            JOptionPane.WARNING_MESSAGE  // 消息类型（显示警告图标）
+                    );
+                }else{
+                    String code_original=(String)table.getValueAt(index,0);
+                    String code= Objects.equals(code_t.getText(), "") ?"Null":code_t.getText();
+                    String name= Objects.equals(name_t.getText(), "") ?"Null":name_t.getText();
+
+                    String sql=String.format("update subject_information set subject_id=%s,subject_name='%s' where subject_id=%s",code,name,code_original);
+                    System.out.println(sql);
+
+                    SQLException t=ConnectDB.AddData(sql);
+                    if(t!=null) {
+                        String error_message = "";
+                        if (t instanceof SQLSyntaxErrorException) {
+                            error_message = "科目编码不能为空";
+                        } else if (t instanceof SQLIntegrityConstraintViolationException) {
+                            error_message = "科目编号不能重复";
+                        }
+
+                        JOptionPane.showMessageDialog(
+                                frame,    // 父组件（对话框将居中显示于此组件）
+                                error_message,  // 消息内容
+                                "错误",               // 对话框标题
+                                JOptionPane.WARNING_MESSAGE  // 消息类型（显示警告图标）
+                        );
+                    }else {
+                        tableModel.setValueAt(code,index,0);
+                        tableModel.setValueAt(name,index,1);
+
+                    }
+                    clear_textfiled();
+                }
+            }
+        };
+        alterData.addActionListener(alter);
 
         ActionListener exit=new ActionListener() {//如果点击关闭按钮，就释放资源
             @Override
             public void actionPerformed(ActionEvent e) {
                 addData.removeActionListener(add);//移除监听器
                 deleteData.removeActionListener(delete);
+                alterData.removeActionListener(alter);
                 clear_textfiled();//清除文本框
                 frame.dispose();//关闭窗口
             }
         };
         exitData.addActionListener(exit);//给关闭按钮加上事件监听
 
+        table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                int index=table.getSelectedRow();
+                if(index!=-1)
+                {
+                    code_t.setText((String) table.getValueAt(index,0));
+                    name_t.setText((String) table.getValueAt(index,1));
+                }
+            }
+        });
+
     }
     public static void clear_textfiled()//清除文本框
     {
         code_t.setText("");
         name_t.setText("");
+        table.getSelectionModel().clearSelection();
     }
 
 }

@@ -5,6 +5,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 import java.util.Objects;
 
 public class MainMenu {
@@ -128,14 +129,18 @@ public class MainMenu {
 
         give_lesson.addActionListener(new ActionListener() {//点击授课资格
             @Override
-            public void actionPerformed(ActionEvent e) {
-                System.out.println("点击授课资格");
+            public void actionPerformed(ActionEvent e) {System.out.println("点击授课资格");
             }
         });
 
         input_data.addActionListener(new ActionListener() {//点击录入成绩
             @Override
             public void actionPerformed(ActionEvent e) {
+                try {
+                    InputScore.show(menu);
+                } catch (SQLException ex) {
+                    throw new RuntimeException(ex);
+                }
                 System.out.println("点击录入成绩");
             }
         });

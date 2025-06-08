@@ -3,7 +3,7 @@ import java.sql.*;
 
 public class ConnectDB {
     static Connection con=null;
-    static Statement st=null;
+    public static Statement st=null;
     static ResultSet re=null;
 
     public void CreateConnect(){

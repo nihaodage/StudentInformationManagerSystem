@@ -282,41 +282,52 @@ public class StudentInformation {
             @Override
             public void actionPerformed(ActionEvent e) {
                 int index=table.getSelectedRow();
-                String code= Objects.equals(code_t.getText(), "") ?"Null":code_t.getText();
-                String name= Objects.equals(name_t.getText(), "") ?"Null":name_t.getText();
-                String age= Objects.equals(age_t.getText(), "") ?"Null":age_t.getText();
-                String gender= (String) gender_t.getSelectedItem();
-                String telephone= Objects.equals(telephone_t.getText(), "") ?"Null":telephone_t.getText();
-                String address= Objects.equals(address_t.getText(), "") ?"Null":address_t.getText();
-
-                String sql=String.format("update student_information set student_id=%s,student_name='%s',age='%s',gender='%s',telephone=%s,address='%s' where student_id=%s",code,name,age,gender,telephone,address,code);
-                System.out.println(sql);
-
-                SQLException t=ConnectDB.AddData(sql);
-                if(t!=null) {
-                    String error_message = "";
-                    if (t instanceof SQLSyntaxErrorException) {
-                        error_message = "学生编码不能为空";
-                    } else if (t instanceof SQLIntegrityConstraintViolationException) {
-                        error_message = "学生编号不能重复";
-                    }
-
+                if(index==-1)
+                {
                     JOptionPane.showMessageDialog(
                             frame,    // 父组件（对话框将居中显示于此组件）
-                            error_message,  // 消息内容
+                            "未选择行",  // 消息内容
                             "错误",               // 对话框标题
                             JOptionPane.WARNING_MESSAGE  // 消息类型（显示警告图标）
                     );
                 }else {
-                    tableModel.setValueAt(code,index,0);
-                    tableModel.setValueAt(name,index,1);
-                    tableModel.setValueAt(age,index,2);
-                    tableModel.setValueAt(gender,index,3);
-                    tableModel.setValueAt(telephone,index,4);
-                    tableModel.setValueAt(address,index,5);
+                    String code_orignal=(String)table.getValueAt(index,0);
+                    String code= Objects.equals(code_t.getText(), "") ?"Null":code_t.getText();
+                    String name= Objects.equals(name_t.getText(), "") ?"Null":name_t.getText();
+                    String age= Objects.equals(age_t.getText(), "") ?"Null":age_t.getText();
+                    String gender= (String) gender_t.getSelectedItem();
+                    String telephone= Objects.equals(telephone_t.getText(), "") ?"Null":telephone_t.getText();
+                    String address= Objects.equals(address_t.getText(), "") ?"Null":address_t.getText();
 
+                    String sql=String.format("update student_information set student_id=%s,student_name='%s',age='%s',gender='%s',telephone=%s,address='%s' where student_id=%s",code,name,age,gender,telephone,address,code_orignal);
+                    System.out.println(sql);
+
+                    SQLException t=ConnectDB.AddData(sql);
+                    if(t!=null) {
+                        String error_message = "";
+                        if (t instanceof SQLSyntaxErrorException) {
+                            error_message = "学生编码不能为空";
+                        } else if (t instanceof SQLIntegrityConstraintViolationException) {
+                            error_message = "学生编号不能重复";
+                        }
+
+                        JOptionPane.showMessageDialog(
+                                frame,    // 父组件（对话框将居中显示于此组件）
+                                error_message,  // 消息内容
+                                "错误",               // 对话框标题
+                                JOptionPane.WARNING_MESSAGE  // 消息类型（显示警告图标）
+                        );
+                    }else {
+                        tableModel.setValueAt(code,index,0);
+                        tableModel.setValueAt(name,index,1);
+                        tableModel.setValueAt(age,index,2);
+                        tableModel.setValueAt(gender,index,3);
+                        tableModel.setValueAt(telephone,index,4);
+                        tableModel.setValueAt(address,index,5);
+
+                    }
+                    clear_textfiled();
                 }
-                clear_textfiled();
             }
         };
         alterData.addActionListener(alter);
@@ -363,6 +374,7 @@ public class StudentInformation {
         telephone_t.setText("");
         address_t.setText("");
         name_t.setText("");
+        table.getSelectionModel().clearSelection();
     }
 
 }
