@@ -148,6 +148,7 @@ public class MainMenu {
         score_analyse.addActionListener(new ActionListener() {//点击成绩分析
             @Override
             public void actionPerformed(ActionEvent e) {
+                ScoreAnalysis.show(menu);
                 System.out.println("点击成绩分析");
             }
         });
